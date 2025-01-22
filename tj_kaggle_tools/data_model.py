@@ -39,7 +39,7 @@ class DataModel:
         self._apply_target_encoding()
 
         # Apply one-hot encoding to specified category columns
-        self._apply_one_hot_encoding()
+        # self._apply_one_hot_encoding()
 
     def _split_data(self):
         """Split the data into training and evaluation sets."""
@@ -49,8 +49,12 @@ class DataModel:
     def _handle_missing_target(self):
         """Handle missing values in the target column."""
         if isinstance(self.target_na_fill, (int, float)):
-            self.train_df = self.train_df.fill_null(self.target_col, self.target_na_fill)
-            self.eval_df = self.eval_df.fill_null(self.target_col, self.target_na_fill)
+            self.train_df = self.train_df.with_columns(
+                pl.col(self.target_col).fill_null(value=self.target_na_fill)
+            )
+            self.eval_df = self.eval_df.with_columns(
+                pl.col(self.target_col).fill_null(value=self.target_na_fill)
+            )
         elif self.target_na_fill == "mean":
             mean_value = self.train_df[self.target_col].mean()
             self.train_df = self.train_df.fill_null(self.target_col, mean_value)
